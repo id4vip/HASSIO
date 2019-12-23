@@ -1,0 +1,14 @@
+- alias: Occupancy Timeout Set
+  trigger:
+    platform: state
+    entity_id: input_boolean.notify_home
+  action:
+    - service: mqtt.publish
+      data:
+        topic: zigbee2mqtt/[YOUR_FRIENDLY_NAME_HERE]/set
+        payload_template: >-
+        {% if is_state('input_boolean.notify_home', 'on') %}
+          { "occupancy_timeout" : 90 }
+        {% else %}
+          { "occupancy_timeout" : 600 }
+        {% endif %}
