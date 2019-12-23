@@ -1,0 +1,77 @@
+################################################################
+## Using only Automation (no Script)
+################################################################
+
+# Put this in automations.yaml
+- alias: Sensor Notifications
+  trigger:
+    - platform: state
+      entity_id:
+        - binary_sensor.1d01_contact
+        - binary_sensor.2d01_contact
+        - binary_sensor.2d02_contact
+        - binary_sensor.2m01_occupancy
+        - binary_sensor.2m02_occupancy
+        - binary_sensor.3d01_contact
+        - binary_sensor.3m01_occupancy
+  action:
+    - service: notify.pushover
+      data_template:
+        title: "Home Alarm {{ states('input_boolean.notify_home')|upper }}"
+        message: "{{ trigger.to_state.name }} was triggered!"
+        data:
+          sound: >-
+            {% if is_state('input_boolean.notify_home', 'on') %}
+              alien
+            {% else %}
+              siren
+            {% endif %}
+          priority: >-
+            {% if is_state('input_boolean.notify_home', 'on') %}
+              2
+            {% else %}
+              0
+            {% endif %}
+
+################################################################
+## Using Automation and Script
+################################################################
+
+# Put this in automations.yaml
+- alias: Sensor Notifications
+  trigger:
+    - platform: state
+      entity_id:
+        - binary_sensor.1d01_contact
+        - binary_sensor.2d01_contact
+        - binary_sensor.2d02_contact
+        - binary_sensor.2m01_occupancy
+        - binary_sensor.2m02_occupancy
+        - binary_sensor.3d01_contact
+        - binary_sensor.3m01_occupancy
+  action:
+    - service: script.send_sensor_notification
+      data_template:
+        sensor_name: "{{ trigger.to_state.name }}"
+
+# Put this in scripts.yaml
+send_sensor_notification:
+  alias: Send Sensor Notification
+  sequence:
+    - service: notify.pushover
+      data_template:
+        title: "Home Alarm {{ states('input_boolean.notify_home')|upper }}"
+        message: "{{ sensor_name }} was triggered!"
+        data:
+          sound: >-
+            {% if is_state('input_boolean.notify_home', 'on') %}
+              alien
+            {% else %}
+              siren
+            {% endif %}
+          priority: >-
+            {% if is_state('input_boolean.notify_home', 'on') %}
+              2
+            {% else %}
+              0
+            {% endif %}
