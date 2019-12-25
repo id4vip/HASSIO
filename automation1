@@ -1,0 +1,45 @@
+- id: '1576547512575'
+  alias: system4all
+  trigger:
+    - platform: state
+      from: 'off'
+      to: 'on'
+      entity_id:
+        - binary_sensor.1d01_contact
+        - binary_sensor.2d01_contact
+        - binary_sensor.2d02_contact
+        - binary_sensor.2m01_occupancy
+        - binary_sensor.2m02_occupancy
+        - binary_sensor.1d02_contact
+        - binary_sensor.2m03_occupancy
+  action:
+    - service: script.push4script
+      data_template:
+        sensor_name: "{{ trigger.to_state.name }}"
+- id: '1576547512585'
+  alias: system4less
+  trigger:
+    - platform: state
+      from: 'off'
+      to: 'on'
+      entity_id:
+        - binary_sensor.1m01_occupancy
+  action:
+    - service: script.push4script
+      data_template:
+        sensor_name: "{{ trigger.to_state.name }}"
+- id: '1576811512077'
+  alias: system4Boolean
+  trigger:
+    - entity_id: input_boolean.notify_home
+      platform: state
+  action:
+    - service: automation.turn_on
+      entity_id: automation.system4all
+    - service_template: >-
+        {% if is_state('input_boolean.notify_home', 'on') %}
+          automation.turn_on
+        {% else %}
+          automation.turn_off
+        {% endif %}
+      entity_id: automation.system4less
