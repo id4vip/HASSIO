@@ -1,0 +1,23 @@
+push4script:
+  alias: push4script
+  sequence:
+    - service: notify.100nu_pushover
+      data_template:
+        title: "Home Alarm {{ states('input_boolean.notify_home')|upper }}"
+        message: "{{ sensor_name }} was triggered!"
+        data:
+          sound: >-
+            {% if is_state('input_boolean.notify_home', 'on') %}
+              alien
+            {% else %}
+              pushover
+            {% endif %}
+          priority: >-
+            {% if is_state('input_boolean.notify_home', 'on') %}
+              2
+            {% else %}
+              0
+            {% endif %}
+          expire: 600
+          timestamp: true
+          retry: 30
